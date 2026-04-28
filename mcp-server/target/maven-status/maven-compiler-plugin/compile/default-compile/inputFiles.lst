@@ -1,4 +1,6 @@
 C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\api\IncidentController.java
+C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\api\LlmAssistantController.java
+C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\config\LlmProperties.java
 C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\config\McpConnectorProperties.java
 C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\connector\CloudWatchConnector.java
 C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\connector\DatabaseConnector.java
@@ -20,5 +22,9 @@ C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\cust
 C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\model\IncidentAnalysisResponse.java
 C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\model\IncidentPayload.java
 C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\model\IncidentSignal.java
+C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\model\LlmQueryRequest.java
+C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\model\LlmQueryResponse.java
 C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\model\RcaResult.java
 C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\service\IncidentOrchestrationService.java
+C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\service\LlmAssistantService.java
+C:\Users\ACER\Downloads\onboarding-service\mcp-server\src\main\java\com\rbs\customer\mcp\server\service\OpenAiCompatibleLlmAssistantService.java
