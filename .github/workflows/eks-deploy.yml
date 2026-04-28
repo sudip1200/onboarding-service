@@ -1,0 +1,90 @@
+name: Build and Deploy to EKS
+
+on:
+  push:
+    branches: ["master"]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: eu-north-1
+  K8S_OVERLAY: dev
+  K8S_NAMESPACE: onboarding
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set image tags
+        id: meta
+        run: |
+          echo "TAG=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Build and push onboarding-service image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPO: ${{ secrets.ECR_REPO_ONBOARDING }}
+          TAG: ${{ steps.meta.outputs.TAG }}
+        run: |
+          IMAGE="${REGISTRY}/${REPO}:${TAG}"
+          docker build -t "${IMAGE}" -f onboarding-service/Dockerfile .
+          docker push "${IMAGE}"
+          echo "ONBOARDING_IMAGE=${REGISTRY}/${REPO}" >> $GITHUB_OUTPUT
+
+      - name: Build and push mcp-server image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPO: ${{ secrets.ECR_REPO_MCP }}
+          TAG: ${{ steps.meta.outputs.TAG }}
+        run: |
+          IMAGE="${REGISTRY}/${REPO}:${TAG}"
+          docker build -t "${IMAGE}" -f mcp-server/Dockerfile .
+          docker push "${IMAGE}"
+          echo "MCP_IMAGE=${REGISTRY}/${REPO}" >> $GITHUB_OUTPUT
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.30.0
+
+      - name: Configure kubeconfig
+        env:
+          EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+        run: |
+          aws eks update-kubeconfig --name "${EKS_CLUSTER_NAME}" --region "${AWS_REGION}"
+
+      - name: Deploy manifests (kustomize)
+        env:
+          TAG: ${{ steps.meta.outputs.TAG }}
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ONBOARDING_REPO: ${{ secrets.ECR_REPO_ONBOARDING }}
+          MCP_REPO: ${{ secrets.ECR_REPO_MCP }}
+        run: |
+          OVERLAY="k8s/overlays/${K8S_OVERLAY}"
+          ONBOARDING_IMAGE="${REGISTRY}/${ONBOARDING_REPO}"
+          MCP_IMAGE="${REGISTRY}/${MCP_REPO}"
+
+          # Replace placeholders in overlay in-place for this run.
+          sed -i "s|REPLACE_ECR_ONBOARDING_IMAGE|${ONBOARDING_IMAGE}|g" "${OVERLAY}/kustomization.yaml"
+          sed -i "s|REPLACE_ECR_MCP_IMAGE|${MCP_IMAGE}|g" "${OVERLAY}/kustomization.yaml"
+          sed -i "s|REPLACE_TAG|${TAG}|g" "${OVERLAY}/kustomization.yaml"
+
+          kubectl apply -k "${OVERLAY}"
+          kubectl rollout status -n "${K8S_NAMESPACE}" deploy/onboarding-service --timeout=180s
+          kubectl rollout status -n "${K8S_NAMESPACE}" deploy/mcp-server --timeout=180s
+

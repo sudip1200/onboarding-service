@@ -1,0 +1,10 @@
+**/target
+**/.idea
+**/*.iml
+**/*.log
+**/*.err
+**/.DS_Store
+**/node_modules
+.git
+.github
+

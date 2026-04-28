@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-server
+  namespace: onboarding
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mcp-server
+  template:
+    metadata:
+      labels:
+        app: mcp-server
+    spec:
+      containers:
+        - name: mcp-server
+          image: mcp-server:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 9092
+          env:
+            - name: SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: onboarding-config
+                  key: SERVER_PORT_MCP
+
+            - name: MCP_JIRA_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: onboarding-config
+                  key: MCP_JIRA_ENABLED
+            - name: MCP_JIRA_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: onboarding-secrets
+                  key: MCP_JIRA_BASE_URL
+            - name: MCP_JIRA_CLOUD_ID
+              valueFrom:
+                secretKeyRef:
+                  name: onboarding-secrets
+                  key: MCP_JIRA_CLOUD_ID
+            - name: MCP_JIRA_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: onboarding-secrets
+                  key: MCP_JIRA_EMAIL
+            - name: MCP_JIRA_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: onboarding-secrets
+                  key: MCP_JIRA_API_TOKEN
+            - name: MCP_JIRA_PROJECT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: onboarding-secrets
+                  key: MCP_JIRA_PROJECT_KEY
+            - name: MCP_JIRA_CREATE_ISSUE_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: onboarding-secrets
+                  key: MCP_JIRA_CREATE_ISSUE_PATH
+            - name: MCP_JIRA_GET_ISSUE_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: onboarding-secrets
+                  key: MCP_JIRA_GET_ISSUE_PATH
+
+            - name: MCP_LLM_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: onboarding-config
+                  key: MCP_LLM_ENABLED
+            - name: MCP_LLM_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: onboarding-config
+                  key: MCP_LLM_PROVIDER
+            - name: MCP_LLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: onboarding-secrets
+                  key: MCP_LLM_API_KEY
+            - name: MCP_LLM_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: onboarding-secrets
+                  key: MCP_LLM_BASE_URL
+            - name: MCP_LLM_MODEL
+              valueFrom:
+                secretKeyRef:
+                  name: onboarding-secrets
+                  key: MCP_LLM_MODEL
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi

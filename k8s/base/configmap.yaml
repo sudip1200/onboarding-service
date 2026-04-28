@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: onboarding-config
+  namespace: onboarding
+data:
+  # onboarding-service
+  SERVER_PORT_ONBOARDING: "8081"
+  SPRING_PROFILES_ACTIVE_ONBOARDING: "postgres"
+  MCP_BASE_URL: "http://mcp-server.onboarding.svc.cluster.local:9092"
+  MCP_INCIDENT_PATH: "/api/v1/incidents"
+
+  # mcp-server
+  SERVER_PORT_MCP: "9092"
+  MCP_JIRA_ENABLED: "false"
+  MCP_LLM_ENABLED: "false"
+  MCP_LLM_PROVIDER: "openai"
+

@@ -1,0 +1,26 @@
+FROM maven:3.9.9-eclipse-temurin-17 AS build
+
+WORKDIR /workspace
+
+COPY pom.xml /workspace/pom.xml
+COPY onboarding-service/pom.xml /workspace/onboarding-service/pom.xml
+
+# Pre-fetch dependencies for better layer caching
+RUN mvn -q -pl onboarding-service -am -DskipTests dependency:go-offline
+
+COPY onboarding-service/src /workspace/onboarding-service/src
+
+RUN mvn -q -pl onboarding-service -am -DskipTests package
+
+
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+COPY --from=build /workspace/onboarding-service/target/*.jar /app/app.jar
+
+EXPOSE 8081
+
+ENV JAVA_OPTS=""
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar /app/app.jar"]
+
