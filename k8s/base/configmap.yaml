@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: onboarding-config
+  name: onboarding-platform-config
   namespace: onboarding
 data:
   # onboarding-service
@@ -15,4 +15,3 @@ data:
   MCP_JIRA_ENABLED: "false"
   MCP_LLM_ENABLED: "false"
   MCP_LLM_PROVIDER: "openai"
-

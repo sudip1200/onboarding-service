@@ -24,74 +24,74 @@ spec:
             - name: SERVER_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: onboarding-config
+                  name: onboarding-platform-config
                   key: SERVER_PORT_MCP
 
             - name: MCP_JIRA_ENABLED
               valueFrom:
                 configMapKeyRef:
-                  name: onboarding-config
+                  name: onboarding-platform-config
                   key: MCP_JIRA_ENABLED
             - name: MCP_JIRA_BASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: MCP_JIRA_BASE_URL
             - name: MCP_JIRA_CLOUD_ID
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: MCP_JIRA_CLOUD_ID
             - name: MCP_JIRA_EMAIL
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: MCP_JIRA_EMAIL
             - name: MCP_JIRA_API_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: MCP_JIRA_API_TOKEN
             - name: MCP_JIRA_PROJECT_KEY
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: MCP_JIRA_PROJECT_KEY
             - name: MCP_JIRA_CREATE_ISSUE_PATH
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: MCP_JIRA_CREATE_ISSUE_PATH
             - name: MCP_JIRA_GET_ISSUE_PATH
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: MCP_JIRA_GET_ISSUE_PATH
 
             - name: MCP_LLM_ENABLED
               valueFrom:
                 configMapKeyRef:
-                  name: onboarding-config
+                  name: onboarding-platform-config
                   key: MCP_LLM_ENABLED
             - name: MCP_LLM_PROVIDER
               valueFrom:
                 configMapKeyRef:
-                  name: onboarding-config
+                  name: onboarding-platform-config
                   key: MCP_LLM_PROVIDER
             - name: MCP_LLM_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: MCP_LLM_API_KEY
             - name: MCP_LLM_BASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: MCP_LLM_BASE_URL
             - name: MCP_LLM_MODEL
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: MCP_LLM_MODEL
           readinessProbe:
             httpGet:

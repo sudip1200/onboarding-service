@@ -34,6 +34,5 @@ Defaults:
 
 ## Notes
 
-- Update `k8s/base/secret.yaml` values before deploying to real environments.
+- Update `k8s/base/secret.yaml` (`onboarding-platform-secrets`) values before deploying to real environments.
 - Do not commit real secrets; use an external secret manager in production.
-

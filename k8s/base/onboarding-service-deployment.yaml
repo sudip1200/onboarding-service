@@ -24,80 +24,80 @@ spec:
             - name: SERVER_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: onboarding-config
+                  name: onboarding-platform-config
                   key: SERVER_PORT_ONBOARDING
             - name: SPRING_PROFILES_ACTIVE
               valueFrom:
                 configMapKeyRef:
-                  name: onboarding-config
+                  name: onboarding-platform-config
                   key: SPRING_PROFILES_ACTIVE_ONBOARDING
 
             - name: MCP_BASE_URL
               valueFrom:
                 configMapKeyRef:
-                  name: onboarding-config
+                  name: onboarding-platform-config
                   key: MCP_BASE_URL
             - name: MCP_INCIDENT_PATH
               valueFrom:
                 configMapKeyRef:
-                  name: onboarding-config
+                  name: onboarding-platform-config
                   key: MCP_INCIDENT_PATH
 
             - name: SPRING_DATASOURCE_URL
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: SPRING_DATASOURCE_URL
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: SPRING_DATASOURCE_USERNAME
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: SPRING_DATASOURCE_PASSWORD
 
             - name: JIRA_ENABLED
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: JIRA_ENABLED
             - name: JIRA_BASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: JIRA_BASE_URL
             - name: JIRA_CLOUD_ID
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: JIRA_CLOUD_ID
             - name: JIRA_EMAIL
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: JIRA_EMAIL
             - name: JIRA_API_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: JIRA_API_TOKEN
             - name: JIRA_PROJECT_KEY
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: JIRA_PROJECT_KEY
             - name: JIRA_ISSUE_TYPE
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: JIRA_ISSUE_TYPE
             - name: JIRA_CREATE_ISSUE_PATH
               valueFrom:
                 secretKeyRef:
-                  name: onboarding-secrets
+                  name: onboarding-platform-secrets
                   key: JIRA_CREATE_ISSUE_PATH
           readinessProbe:
             httpGet:
