@@ -23,9 +23,12 @@ public class McpConnectorProperties {
     public static class Jira {
         private boolean enabled = false;
         private String baseUrl;
+        private String cloudId;
         private String email;
         private String apiToken;
         private String projectKey;
+        private String createIssuePath = "/rest/api/3/issue";
+        private String getIssuePath = "/rest/api/3/issue";
     }
 
     @Getter

@@ -12,9 +12,10 @@ import org.springframework.stereotype.Component;
 public class JiraProperties {
     private boolean enabled = false;
     private String baseUrl;
+    private String cloudId;
     private String email;
     private String apiToken;
     private String projectKey = "OBS";
     private String issueType = "Bug";
-    private String createIssuePath = "/rest/api/2/issue";
+    private String createIssuePath = "/rest/api/3/issue";
 }

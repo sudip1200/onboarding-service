@@ -21,18 +21,6 @@
         <aws.sdk.version>2.32.20</aws.sdk.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>software.amazon.awssdk</groupId>
-                <artifactId>bom</artifactId>
-                <version>${aws.sdk.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -49,6 +37,12 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>cloudwatchlogs</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>regions</artifactId>
+            <version>${aws.sdk.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

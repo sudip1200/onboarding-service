@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.nio.charset.StandardCharsets;
+import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,12 +22,22 @@ import java.util.Map;
 @ConditionalOnProperty(prefix = "mcp.connectors.jira", name = "enabled", havingValue = "true")
 public class JiraRestConnector implements JiraConnector {
 
+    private static final String ATLASSIAN_API_BASE = "https://api.atlassian.com/ex/jira";
+    private static final String ISSUE_FIELDS = "summary,description,status,priority,labels,issuetype";
     private final McpConnectorProperties properties;
 
     @Override
     @SuppressWarnings("unchecked")
     public String createOrUpdateIncidentTicket(IncidentPayload payload, RcaResult rcaResult) {
-        String auth = basicAuth(properties.getJira().getEmail(), properties.getJira().getApiToken());
+        JiraRequestTarget target = resolveTarget(properties.getJira().getCreateIssuePath(), "/rest/api/3/issue");
+        if (target == null) {
+            log.error(
+                    "jira.connector.failed correlationId={} message={}",
+                    payload.signal().correlationId(),
+                    "Jira configuration is incomplete. Provide MCP_JIRA_CLOUD_ID + MCP_JIRA_API_TOKEN for scoped auth, or MCP_JIRA_BASE_URL + MCP_JIRA_EMAIL + MCP_JIRA_API_TOKEN for basic auth."
+            );
+            return "FAILED";
+        }
         String summary = "[" + payload.criticality() + "] onboarding incident " + payload.signal().errorCode();
 
         Map<String, Object> request = Map.of(
@@ -41,8 +52,8 @@ public class JiraRestConnector implements JiraConnector {
         try {
             Map<String, Object> response = RestClient.create()
                     .post()
-                    .uri(trimTrailingSlash(properties.getJira().getBaseUrl()) + "/rest/api/2/issue")
-                    .header("Authorization", "Basic " + auth)
+                    .uri(target.url())
+                    .header("Authorization", target.authorizationHeader())
                     .header("Accept", "application/json")
                     .header("Content-Type", "application/json")
                     .body(request)
@@ -60,6 +71,74 @@ public class JiraRestConnector implements JiraConnector {
             );
             return "FAILED";
         }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> fetchTicketByKey(String ticketKey) {
+        String safeTicketKey = safe(ticketKey);
+        if (safeTicketKey.isEmpty()) {
+            return Map.of("status", "INVALID_REQUEST", "message", "ticketKey is required");
+        }
+
+        JiraRequestTarget target = resolveTarget(properties.getJira().getGetIssuePath(), "/rest/api/3/issue");
+        if (target == null) {
+            return Map.of(
+                    "key", safeTicketKey,
+                    "status", "FAILED",
+                    "message", "Jira configuration is incomplete."
+            );
+        }
+
+        String encodedKey = URLEncoder.encode(safeTicketKey, StandardCharsets.UTF_8);
+        String url = target.url() + "/" + encodedKey + "?fields=" + ISSUE_FIELDS;
+        try {
+            Map<String, Object> response = RestClient.create()
+                    .get()
+                    .uri(url)
+                    .header("Authorization", target.authorizationHeader())
+                    .header("Accept", "application/json")
+                    .retrieve()
+                    .body(Map.class);
+
+            if (response == null) {
+                return Map.of(
+                        "key", safeTicketKey,
+                        "status", "EMPTY",
+                        "message", "No Jira response received."
+                );
+            }
+            return response;
+        } catch (Exception ex) {
+            log.error("jira.connector.fetch.failed ticketKey={} message={}", safeTicketKey, ex.getMessage());
+            return Map.of(
+                    "key", safeTicketKey,
+                    "status", "FAILED",
+                    "message", safe(ex.getMessage())
+            );
+        }
+    }
+
+    private JiraRequestTarget resolveTarget(String configuredPath, String fallbackPath) {
+        McpConnectorProperties.Jira jira = properties.getJira();
+        String token = safe(jira.getApiToken());
+        String cloudId = safe(jira.getCloudId());
+        String email = safe(jira.getEmail());
+        String path = normalizePath(configuredPath, fallbackPath);
+
+        if (!cloudId.isEmpty() && !token.isEmpty()) {
+            String url = ATLASSIAN_API_BASE + "/" + cloudId + path;
+            if (!email.isEmpty()) {
+                return new JiraRequestTarget(url, "Basic " + basicAuth(email, token));
+            }
+            return new JiraRequestTarget(url, "Bearer " + token);
+        }
+
+        String baseUrl = trimTrailingSlash(jira.getBaseUrl());
+        if (!baseUrl.isEmpty() && !email.isEmpty() && !token.isEmpty()) {
+            return new JiraRequestTarget(baseUrl + path, "Basic " + basicAuth(email, token));
+        }
+        return null;
     }
 
     private String buildDescription(IncidentPayload payload, RcaResult rcaResult) {
@@ -86,7 +165,18 @@ public class JiraRestConnector implements JiraConnector {
         return safeValue.endsWith("/") ? safeValue.substring(0, safeValue.length() - 1) : safeValue;
     }
 
+    private String normalizePath(String value, String fallback) {
+        String safeValue = safe(value);
+        if (safeValue.isEmpty()) {
+            return fallback;
+        }
+        return safeValue.startsWith("/") ? safeValue : "/" + safeValue;
+    }
+
     private String safe(String value) {
-        return value == null ? "" : value;
+        return value == null ? "" : value.trim();
+    }
+
+    private record JiraRequestTarget(String url, String authorizationHeader) {
     }
 }

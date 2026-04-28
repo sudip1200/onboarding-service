@@ -71,6 +71,41 @@ Set values in `src/main/resources/application.properties` or env vars:
 - Figma: `mcp.connectors.figma.*`
 - Database: `mcp.connectors.database.*`
 
+## LLM assistant API (Postman/UI)
+
+You can query MCP with a general question endpoint:
+
+- `POST /api/v1/assistant/query`
+
+Example request:
+
+```json
+{
+  "question": "Analyze this Jira ticket and suggest exact code changes.",
+  "jiraId": "OBS-123",
+  "code": "public ResponseEntity<?> onboard(CreateOnboardingRequest req) { ... }",
+  "model": "gpt-4o-mini",
+  "correlationId": "abc-123",
+  "context": {
+    "endpoint": "POST /api/v1/onboardings",
+    "statusCode": 500
+  }
+}
+```
+
+Notes:
+
+- `model` is optional. If omitted, server uses `MCP_LLM_MODEL`.
+- You can send only `jiraId`, or combine `jiraId` with `question`/`code`/`context`.
+- The API response contains the LLM answer directly in `answer`, visible in Postman response body.
+
+Enable by env vars:
+
+- `MCP_LLM_ENABLED=true`
+- `MCP_LLM_API_KEY=<your-api-key>`
+- `MCP_LLM_MODEL=gpt-4o-mini`
+- Optional `MCP_LLM_BASE_URL` for OpenAI-compatible providers
+
 Current implementation is stub/no-op connectors by design. Replace connector implementations in `connector/impl` with real SDK/API clients.
 
 ## Real connectors now available
