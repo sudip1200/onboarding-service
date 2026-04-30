@@ -1,6 +1,6 @@
 # Kubernetes (EKS)
 
-This repo deploys two services:
+This repo deploys two services: 
 
 - `onboarding-service` (port 8081)
 - `mcp-server` (port 9092)
