@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 env:
-  AWS_REGION: eu-north-1
+  AWS_REGION: us-east-1
   K8S_OVERLAY: ${{ github.event.inputs.overlay || 'dev' }}
   K8S_NAMESPACE: onboarding
 
